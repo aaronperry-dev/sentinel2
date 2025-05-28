@@ -125,7 +125,7 @@
         /* --- CSS for Credit Text --- */
         .image-credit {
             max-width: 900px; /* Match slider width */
-            margin: 5px auto 20px; /* Space above/below */
+            margin: 5px auto 15px; /* Reduced margin-bottom */
             font-size: 0.85em; /* Smaller font */
             color: #666; /* Gray text */
             text-align: right; /* Align to the right */
@@ -134,46 +134,52 @@
 
         @media (max-width: 768px) {
             .image-credit {
-                margin: 5px 10px 20px; /* Adjust margin for smaller screens */
+                margin: 5px 10px 15px; /* Adjust margin for smaller screens */
                 text-align: center; /* Center on smaller screens if preferred */
             }
         }
 
-        /* --- NEW CSS for Legend --- */
+        /* --- REVISED CSS for Legend --- */
         .legend-container {
             max-width: 900px;
-            margin: 20px auto 30px;
-            text-align: left; /* Align legend items to the left */
+            margin: 10px auto 30px; /* Reduced top margin, increased bottom margin to separate from next section */
+            text-align: left;
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 5px;
             background-color: #fff;
+            display: grid; /* Use CSS Grid for a multi-column layout */
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* 2 columns for wider screens, adapts to 1 */
+            gap: 5px 15px; /* Reduced vertical gap, increased horizontal gap */
         }
 
         .legend-container h3 {
+            grid-column: 1 / -1; /* Make the heading span all columns */
             margin-top: 0;
             color: #0056b3;
-            font-size: 1.2em;
-            margin-bottom: 15px;
+            font-size: 1.1em; /* Smaller font for heading */
+            margin-bottom: 10px; /* Reduced margin */
+            text-align: center; /* Center the legend title */
         }
 
         .legend-item {
-            display: flex; /* Use flexbox for horizontal alignment of color box and text */
-            align-items: center; /* Vertically center items */
-            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            margin-bottom: 0px; /* Remove bottom margin for compactness */
         }
 
         .legend-color-box {
-            width: 20px;
-            height: 20px;
-            border: 1px solid #ccc; /* Subtle border for clarity */
-            margin-right: 10px;
-            flex-shrink: 0; /* Prevent box from shrinking */
+            width: 16px; /* Smaller box */
+            height: 16px; /* Smaller box */
+            border: 1px solid #ccc;
+            margin-right: 8px; /* Reduced margin */
+            flex-shrink: 0;
         }
 
         .legend-item span {
-            font-size: 0.95em;
+            font-size: 0.85em; /* Smaller font for text */
             color: #555;
+            line-height: 1.2; /* Adjust line height for compactness */
         }
     </style>
 </head>
@@ -199,39 +205,6 @@
     <div class="image-credit">
         Credit: Aaron Perry, derived from Sentinel-2 data.
     </div>
-
-    <p>
-        Satellite imagery offers invaluable insights into our planet. The Sentinel-2 mission, a part of the European Union's Copernicus programme, provides high-resolution optical imagery for land monitoring, emergency services, and security. Below, we detail how these specific image products are created.
-    </p>
-
-    <h2>True Color Composite</h2>
-    <p>
-        A True Color composite image is created by combining specific spectral bands to visually represent the Earth's surface as it would appear to the human eye. This type of composite is often referred to as a "natural color" image.
-    </p>
-    <ul>
-        <li><strong>Red Band (B4):</strong> Corresponds to the red part of the electromagnetic spectrum. Healthy vegetation absorbs red light strongly, while bare soil and urban areas reflect it more.</li>
-        <li><strong>Green Band (B3):</strong> Corresponds to the green part of the electromagnetic spectrum. Vegetation reflects green light, which is why healthy plants appear green.</li>
-        <li><strong>Blue Band (B2):</strong> Corresponds to the blue part of the electromagnetic spectrum. Water bodies tend to absorb blue light, while aerosols and haze scatter it.</li>
-    </ul>
-    <p>
-        By assigning the Red band to the Red color channel of the display, the Green band to the Green color channel, and the Blue band to the Blue color channel (i.e., **RGB = B4, B3, B2**), we get an image that closely resembles what we would see from space. This makes it ideal for general visualization, identifying urban areas, bare ground, and recognizing cloud formations.
-    </p>
-
-    <h2>Land Cover Classification</h2>
-    <p>
-        A Land Cover Classification image is a thematic map derived from satellite imagery, where each pixel is assigned to a specific land cover class based on its spectral characteristics. Unlike True Color images, which are direct representations of light reflection, classification images are the result of advanced data analysis and machine learning algorithms.
-    </p>
-    <ul>
-        <li><strong>Data Source:</strong> The classification is typically performed using multiple spectral bands from Sentinel-2, often including:
-            <ul>
-                <li>Visible bands (Blue, Green, Red)</li>
-                <li>Near-Infrared (NIR) bands (e.g., B8, B8A): Highly sensitive to vegetation health and density.</li>
-                <li>Shortwave Infrared (SWIR) bands (e.g., B11, B12): Useful for distinguishing between different types of vegetation, soil moisture, and bare ground.</li>
-            </ul>
-        </li>
-        <li><strong>Classification Process:</strong> Algorithms analyze the unique spectral signature (how different land cover types reflect and absorb light across various bands) of each pixel. This involves training the algorithm with known samples of different land cover types (e.g., forest, water, urban, agriculture).</li>
-        <li><strong>Output:</strong> Each pixel is then assigned a color that represents its classified land cover type (e.g., dark green for dense forest, light green for grassland, grey for urban areas, blue for water, etc.). The specific colors used depend on the classification scheme.</li>
-    </ul>
 
     <div class="legend-container">
         <h3>Land Cover Classes Legend</h3>
@@ -269,6 +242,38 @@
             <div class="legend-color-box" style="background-color: #ffc27f;"></div><span>11: Bare Soil</span>
         </div>
     </div>
+    <p>
+        Satellite imagery offers invaluable insights into our planet. The Sentinel-2 mission, a part of the European Union's Copernicus programme, provides high-resolution optical imagery for land monitoring, emergency services, and security. Below, we detail how these specific image products are created.
+    </p>
+
+    <h2>True Color Composite</h2>
+    <p>
+        A True Color composite image is created by combining specific spectral bands to visually represent the Earth's surface as it would appear to the human eye. This type of composite is often referred to as a "natural color" image.
+    </p>
+    <ul>
+        <li><strong>Red Band (B4):</strong> Corresponds to the red part of the electromagnetic spectrum. Healthy vegetation absorbs red light strongly, while bare soil and urban areas reflect it more.</li>
+        <li><strong>Green Band (B3):</strong> Corresponds to the green part of the electromagnetic spectrum. Vegetation reflects green light, which is why healthy plants appear green.</li>
+        <li><strong>Blue Band (B2):</strong> Corresponds to the blue part of the electromagnetic spectrum. Water bodies tend to absorb blue light, while aerosols and haze scatter it.</li>
+    </ul>
+    <p>
+        By assigning the Red band to the Red color channel of the display, the Green band to the Green color channel, and the Blue band to the Blue color channel (i.e., **RGB = B4, B3, B2**), we get an image that closely resembles what we would see from space. This makes it ideal for general visualization, identifying urban areas, bare ground, and recognizing cloud formations.
+    </p>
+
+    <h2>Land Cover Classification</h2>
+    <p>
+        A Land Cover Classification image is a thematic map derived from satellite imagery, where each pixel is assigned to a specific land cover class based on its spectral characteristics. Unlike True Color images, which are direct representations of light reflection, classification images are the result of advanced data analysis and machine learning algorithms.
+    </p>
+    <ul>
+        <li><strong>Data Source:</strong> The classification is typically performed using multiple spectral bands from Sentinel-2, often including:
+            <ul>
+                <li>Visible bands (Blue, Green, Red)</li>
+                <li>Near-Infrared (NIR) bands (e.g., B8, B8A): Highly sensitive to vegetation health and density.</li>
+                <li>Shortwave Infrared (SWIR) bands (e.g., B11, B12): Useful for distinguishing between different types of vegetation, soil moisture, and bare ground.</li>
+            </ul>
+        </li>
+        <li><strong>Classification Process:</strong> Algorithms analyze the unique spectral signature (how different land cover types reflect and absorb light across various bands) of each pixel. This involves training the algorithm with known samples of different land cover types (e.g., forest, water, urban, agriculture).</li>
+        <li><strong>Output:</strong> Each pixel is then assigned a color that represents its classified land cover type (e.g., dark green for dense forest, light green for grassland, grey for urban areas, blue for water, etc.). The specific colors used depend on the classification scheme.</li>
+    </ul>
     <p>
         Land Cover Classification images are crucial for environmental monitoring, urban planning, agriculture management, and understanding ecological changes over time. They provide a simplified yet powerful thematic view of the landscape.
     </p>
