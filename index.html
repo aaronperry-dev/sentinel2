@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sentinel-2 L2A Image Comparison</title>
+    <title>Sentinel-2 L2A True Color vs. Land Cover Classification Comparison</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/img-comparison-slider@8/dist/styles.css"/>
     <style>
         /* Basic styling for your page */
@@ -47,38 +47,38 @@
             height: auto;
         }
 
-        /* --- NEW CSS for Overlay Text --- */
+        /* --- REVISED CSS for Overlay Text --- */
+        /* Ensure the slot contents are positioned relatively for absolute children */
+        img-comparison-slider [slot="first"],
+        img-comparison-slider [slot="second"] {
+            position: relative; /* Essential for absolute positioning of child text */
+            /* Add this to ensure the image itself fills the slot, which is important for clipping */
+            display: block; /* Make the slot content a block element */
+            width: 100%;
+            height: 100%;
+        }
+
+
         .image-overlay-text {
-            position: absolute; /* Position relative to the slider component */
-            bottom: 10px;      /* Distance from the bottom */
-            left: 10px;        /* Distance from the left */
-            color: white;      /* White text */
+            position: absolute;
+            bottom: 10px; /* Distance from the bottom */
+            color: white;
             background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
-            padding: 5px 10px; /* Padding around the text */
-            border-radius: 5px; /* Slightly rounded corners for the background */
-            font-size: 0.9em;  /* Slightly smaller font size */
-            z-index: 10;       /* Ensure it's above the image */
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.9em;
+            z-index: 10;
             pointer-events: none; /* Allows clicks to pass through to the image/slider */
+            /* New: Align text to the respective side of the image */
+            /* This will be overridden for the second slot */
+            left: 10px;
+            white-space: nowrap; /* Prevent text from wrapping, keeping background tighter */
         }
 
         /* For the second image, position on the right */
         img-comparison-slider [slot="second"] .image-overlay-text {
-            left: auto; /* Reset left */
+            left: auto; /* Reset left positioning */
             right: 10px; /* Position from the right */
-        }
-
-        /* Ensure images and text occupy their respective slots properly */
-        img-comparison-slider [slot="first"],
-        img-comparison-slider [slot="second"] {
-            position: relative; /* Needed for absolute positioning of overlay text */
-            display: flex; /* Helps ensure content inside fills the slot */
-            align-items: flex-end; /* Aligns content to the bottom */
-            justify-content: flex-start; /* Aligns content to the left by default */
-        }
-
-        /* For the second slot, align content to the right */
-        img-comparison-slider [slot="second"] {
-            justify-content: flex-end;
         }
 
     </style>
