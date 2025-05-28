@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sentinel-2 L2A True Color vs. Land Cover Classification Comparison</title>
+    <title>Sentinel-2 Image Comparison</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/img-comparison-slider@8/dist/styles.css"/>
     <style>
         /* Basic styling for your page */
@@ -16,16 +16,49 @@
         }
         h1 {
             color: #0056b3;
+            margin-bottom: 10px;
+        }
+        h2 {
+            color: #0056b3;
+            margin-top: 30px;
+            margin-bottom: 10px;
+            font-size: 1.5em;
         }
         p {
             margin-top: 20px;
             line-height: 1.6;
+            max-width: 900px; /* Constrain paragraph width for readability */
+            margin-left: auto;
+            margin-right: auto;
+            text-align: left; /* Align text left within its constrained width */
         }
+        ul {
+            list-style: none; /* Remove default bullet points */
+            padding: 0;
+            max-width: 900px; /* Constrain list width for readability */
+            margin-left: auto;
+            margin-right: auto;
+            text-align: left; /* Align list items left */
+        }
+        ul li {
+            margin-bottom: 8px;
+            padding-left: 20px; /* Indent list items */
+            position: relative;
+        }
+        ul li::before {
+            content: "•"; /* Custom bullet point */
+            color: #0056b3;
+            font-weight: bold;
+            display: inline-block;
+            width: 1em;
+            margin-left: -1em;
+        }
+
 
         /* Styles for the comparison slider itself */
         img-comparison-slider {
             max-width: 900px;
-            margin: 30px auto;
+            margin: 30px auto 0; /* Adjusted margin-bottom to 0 for credit alignment */
             height: auto;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
             border-radius: 8px;
@@ -36,7 +69,11 @@
         @media (max-width: 768px) {
             img-comparison-slider {
                 max-width: 100%;
-                margin: 20px 10px;
+                margin: 20px 10px 0; /* Adjusted margin-bottom to 0 for credit alignment */
+            }
+            p, ul {
+                margin-left: 10px;
+                margin-right: 10px;
             }
         }
 
@@ -47,38 +84,49 @@
             height: auto;
         }
 
-        /* --- REVISED CSS for Overlay Text --- */
-        /* Ensure the slot contents are positioned relatively for absolute children */
+        /* --- CSS for Overlay Text --- */
         img-comparison-slider [slot="first"],
         img-comparison-slider [slot="second"] {
             position: relative; /* Essential for absolute positioning of child text */
-            /* Add this to ensure the image itself fills the slot, which is important for clipping */
-            display: block; /* Make the slot content a block element */
+            display: block;
             width: 100%;
             height: 100%;
         }
 
-
         .image-overlay-text {
             position: absolute;
-            bottom: 10px; /* Distance from the bottom */
+            bottom: 10px;
             color: white;
-            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
+            background-color: rgba(0, 0, 0, 0.5);
             padding: 5px 10px;
             border-radius: 5px;
             font-size: 0.9em;
             z-index: 10;
-            pointer-events: none; /* Allows clicks to pass through to the image/slider */
-            /* New: Align text to the respective side of the image */
-            /* This will be overridden for the second slot */
+            pointer-events: none;
             left: 10px;
-            white-space: nowrap; /* Prevent text from wrapping, keeping background tighter */
+            white-space: nowrap;
         }
 
-        /* For the second image, position on the right */
         img-comparison-slider [slot="second"] .image-overlay-text {
-            left: auto; /* Reset left positioning */
-            right: 10px; /* Position from the right */
+            left: auto;
+            right: 10px;
+        }
+
+        /* --- NEW CSS for Credit Text --- */
+        .image-credit {
+            max-width: 900px; /* Match slider width */
+            margin: 5px auto 20px; /* Space above/below */
+            font-size: 0.85em; /* Smaller font */
+            color: #666; /* Gray text */
+            text-align: right; /* Align to the right */
+            padding: 0 10px; /* Small horizontal padding */
+        }
+
+        @media (max-width: 768px) {
+            .image-credit {
+                margin: 5px 10px 20px; /* Adjust margin for smaller screens */
+                text-align: center; /* Center on smaller screens if preferred */
+            }
         }
 
     </style>
@@ -87,7 +135,7 @@
     <h1>Sentinel-2 Imagery Comparison</h1>
 
     <p>
-        Explore the difference between a true-color Sentinel-2 satellite image and its corresponding land cover classification.
+        Explore the difference between a true-color Sentinel-2 satellite image and its corresponding land cover classification. Drag the slider bar to reveal more of either the original satellite view or the classified land cover map.
     </p>
 
     <img-comparison-slider>
@@ -102,8 +150,44 @@
         </div>
     </img-comparison-slider>
 
+    <div class="image-credit">
+        Credit: Aaron Perry, derived from Sentinel-2 data.
+    </div>
+
     <p>
-        Drag the slider bar to reveal more of either the original satellite view or the classified land cover map.
+        Satellite imagery offers invaluable insights into our planet. The Sentinel-2 mission, a part of the European Union's Copernicus programme, provides high-resolution optical imagery for land monitoring, emergency services, and security. Below, we detail how these specific image products are created.
+    </p>
+
+    <h2>True Color Composite</h2>
+    <p>
+        A True Color composite image is created by combining specific spectral bands to visually represent the Earth's surface as it would appear to the human eye. This type of composite is often referred to as a "natural color" image.
+    </p>
+    <ul>
+        <li><strong>Red Band (B4):</strong> Corresponds to the red part of the electromagnetic spectrum. Healthy vegetation absorbs red light strongly, while bare soil and urban areas reflect it more.</li>
+        <li><strong>Green Band (B3):</strong> Corresponds to the green part of the electromagnetic spectrum. Vegetation reflects green light, which is why healthy plants appear green.</li>
+        <li><strong>Blue Band (B2):</strong> Corresponds to the blue part of the electromagnetic spectrum. Water bodies tend to absorb blue light, while aerosols and haze scatter it.</li>
+    </ul>
+    <p>
+        By assigning the Red band to the Red color channel of the display, the Green band to the Green color channel, and the Blue band to the Blue color channel (i.e., **RGB = B4, B3, B2**), we get an image that closely resembles what we would see from space. This makes it ideal for general visualization, identifying urban areas, bare ground, and recognizing cloud formations.
+    </p>
+
+    <h2>Land Cover Classification</h2>
+    <p>
+        A Land Cover Classification image is a thematic map derived from satellite imagery, where each pixel is assigned to a specific land cover class based on its spectral characteristics. Unlike True Color images, which are direct representations of light reflection, classification images are the result of advanced data analysis and machine learning algorithms.
+    </p>
+    <ul>
+        <li><strong>Data Source:</strong> The classification is typically performed using multiple spectral bands from Sentinel-2, often including:
+            <ul>
+                <li>Visible bands (Blue, Green, Red)</li>
+                <li>Near-Infrared (NIR) bands (e.g., B8, B8A): Highly sensitive to vegetation health and density.</li>
+                <li>Shortwave Infrared (SWIR) bands (e.g., B11, B12): Useful for distinguishing between different types of vegetation, soil moisture, and bare ground.</li>
+            </ul>
+        </li>
+        <li><strong>Classification Process:</strong> Algorithms analyze the unique spectral signature (how different land cover types reflect and absorb light across various bands) of each pixel. This involves training the algorithm with known samples of different land cover types (e.g., forest, water, urban, agriculture).</li>
+        <li><strong>Output:</strong> Each pixel is then assigned a color that represents its classified land cover type (e.g., dark green for dense forest, light green for grassland, grey for urban areas, blue for water, etc.). The specific colors used depend on the classification scheme.</li>
+    </ul>
+    <p>
+        Land Cover Classification images are crucial for environmental monitoring, urban planning, agriculture management, and understanding ecological changes over time. They provide a simplified yet powerful thematic view of the landscape.
     </p>
 
     <script defer src="https://cdn.jsdelivr.net/npm/img-comparison-slider@8/dist/index.js"></script>
