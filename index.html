@@ -84,7 +84,7 @@
             height: auto;
         }
 
-        /* --- REVISED CSS for Overlay Text --- */
+        /* --- CSS for Overlay Text --- */
         /* These styles are applied to the <div> that wraps the image and text */
         img-comparison-slider [slot="first"] > div,
         img-comparison-slider [slot="second"] > div {
@@ -111,21 +111,18 @@
             font-size: 0.9em;
             z-index: 10;
             pointer-events: none;
-            /* Removed fixed 'left' or 'right' to let the flexbox container handle it */
             white-space: nowrap;
-            /* Adjust positioning slightly more to ensure it's within the image area */
-            transform: translateX(0%); /* Reset any default transformations */
-            left: 10px; /* Default for first image */
+            transform: translateX(0%);
+            left: 10px;
         }
 
-        /* For the second image, adjust position from right */
         img-comparison-slider [slot="second"] .image-overlay-text {
-            left: auto; /* Remove left */
-            right: 10px; /* Position from the right */
+            left: auto;
+            right: 10px;
         }
 
 
-        /* --- NEW CSS for Credit Text --- */
+        /* --- CSS for Credit Text --- */
         .image-credit {
             max-width: 900px; /* Match slider width */
             margin: 5px auto 20px; /* Space above/below */
@@ -142,6 +139,42 @@
             }
         }
 
+        /* --- NEW CSS for Legend --- */
+        .legend-container {
+            max-width: 900px;
+            margin: 20px auto 30px;
+            text-align: left; /* Align legend items to the left */
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+
+        .legend-container h3 {
+            margin-top: 0;
+            color: #0056b3;
+            font-size: 1.2em;
+            margin-bottom: 15px;
+        }
+
+        .legend-item {
+            display: flex; /* Use flexbox for horizontal alignment of color box and text */
+            align-items: center; /* Vertically center items */
+            margin-bottom: 8px;
+        }
+
+        .legend-color-box {
+            width: 20px;
+            height: 20px;
+            border: 1px solid #ccc; /* Subtle border for clarity */
+            margin-right: 10px;
+            flex-shrink: 0; /* Prevent box from shrinking */
+        }
+
+        .legend-item span {
+            font-size: 0.95em;
+            color: #555;
+        }
     </style>
 </head>
 <body>
@@ -199,6 +232,43 @@
         <li><strong>Classification Process:</strong> Algorithms analyze the unique spectral signature (how different land cover types reflect and absorb light across various bands) of each pixel. This involves training the algorithm with known samples of different land cover types (e.g., forest, water, urban, agriculture).</li>
         <li><strong>Output:</strong> Each pixel is then assigned a color that represents its classified land cover type (e.g., dark green for dense forest, light green for grassland, grey for urban areas, blue for water, etc.). The specific colors used depend on the classification scheme.</li>
     </ul>
+
+    <div class="legend-container">
+        <h3>Land Cover Classes Legend</h3>
+        <div class="legend-item">
+            <div class="legend-color-box" style="background-color: #e0e0e0;"></div><span>0: Unclassified</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color-box" style="background-color: #d3d3d3;"></div><span>1: Clouds / Haze</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color-box" style="background-color: #87ceeb;"></div><span>2: Water</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color-box" style="background-color: #ffffff; border: 1px solid #ccc;"></div><span>3: Snow / Ice</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color-box" style="background-color: #696969;"></div><span>4: Cloud Shadows</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color-box" style="background-color: #006400;"></div><span>5: Dense Conifer Forest</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color-box" style="background-color: #808080;"></div><span>6: Roadways</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color-box" style="background-color: #008000;"></div><span>8: Dense Forest</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color-box" style="background-color: #98fb98;"></div><span>9: Low Vegetation</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color-box" style="background-color: #d2b48c;"></div><span>10: Bare Rock</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color-box" style="background-color: #ffc27f;"></div><span>11: Bare Soil</span>
+        </div>
+    </div>
     <p>
         Land Cover Classification images are crucial for environmental monitoring, urban planning, agriculture management, and understanding ecological changes over time. They provide a simplified yet powerful thematic view of the landscape.
     </p>
