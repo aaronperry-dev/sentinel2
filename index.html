@@ -3,31 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sentinel-2 Image Comparison</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/img-comparison-slider@8/dist/styles.css">
+    <title>Sentinel-2 L2A Image Comparison</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/img-comparison-slider@8/dist/styles.css"/>
     <style>
-        /* Optional: Add some basic styling for your page */
+        /* Basic styling for your page */
         body {
-            font-family: sans-serif;
+            font-family: Arial, sans-serif;
             margin: 20px;
             text-align: center;
+            background-color: #f4f4f4;
+            color: #333;
         }
+        h1 {
+            color: #0056b3;
+        }
+        p {
+            margin-top: 20px;
+            line-height: 1.6;
+        }
+
+        /* Styles for the comparison slider itself */
         img-comparison-slider {
-            max-width: 800px; /* Limit the max width of the slider */
-            margin: 20px auto; /* Center the slider */
-            height: auto; /* Maintain aspect ratio */
+            max-width: 900px;
+            margin: 30px auto;
+            height: auto;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden; /* Important for border-radius to apply correctly */
         }
+
+        /* Responsive adjustments for smaller screens */
+        @media (max-width: 768px) {
+            img-comparison-slider {
+                max-width: 100%;
+                margin: 20px 10px;
+            }
+        }
+
+        /* Adjust image styling within the slider if needed */
+        img-comparison-slider img {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        /* --- NEW CSS for Overlay Text --- */
+        .image-overlay-text {
+            position: absolute; /* Position relative to the slider component */
+            bottom: 10px;      /* Distance from the bottom */
+            left: 10px;        /* Distance from the left */
+            color: white;      /* White text */
+            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
+            padding: 5px 10px; /* Padding around the text */
+            border-radius: 5px; /* Slightly rounded corners for the background */
+            font-size: 0.9em;  /* Slightly smaller font size */
+            z-index: 10;       /* Ensure it's above the image */
+            pointer-events: none; /* Allows clicks to pass through to the image/slider */
+        }
+
+        /* For the second image, position on the right */
+        img-comparison-slider [slot="second"] .image-overlay-text {
+            left: auto; /* Reset left */
+            right: 10px; /* Position from the right */
+        }
+
+        /* Ensure images and text occupy their respective slots properly */
+        img-comparison-slider [slot="first"],
+        img-comparison-slider [slot="second"] {
+            position: relative; /* Needed for absolute positioning of overlay text */
+            display: flex; /* Helps ensure content inside fills the slot */
+            align-items: flex-end; /* Aligns content to the bottom */
+            justify-content: flex-start; /* Aligns content to the left by default */
+        }
+
+        /* For the second slot, align content to the right */
+        img-comparison-slider [slot="second"] {
+            justify-content: flex-end;
+        }
+
     </style>
 </head>
 <body>
-    <h1>Sentinel-2 Before & After</h1>
+    <h1>Sentinel-2 Imagery Comparison</h1>
+
+    <p>
+        Explore the difference between a true-color Sentinel-2 satellite image and its corresponding land cover classification.
+    </p>
 
     <img-comparison-slider>
-        <img slot="first" src="images/S2TrueColor.PNG" alt="Before image">
-        <img slot="second" src="images/S2LandCoverClass.PNG" alt="After image">
+        <div slot="first">
+            <img src="images/S2TrueColor.PNG" alt="Sentinel-2 True Color Image" />
+            <span class="image-overlay-text">True Color</span>
+        </div>
+
+        <div slot="second">
+            <img src="images/S2LandCoverClass.PNG" alt="Sentinel-2 Land Cover Classification" />
+            <span class="image-overlay-text">Land Cover Classification</span>
+        </div>
     </img-comparison-slider>
 
-    <p>This is a comparison of Sentinel-2 imagery.</p>
+    <p>
+        Drag the slider bar to reveal more of either the original satellite view or the classified land cover map.
+    </p>
 
     <script defer src="https://cdn.jsdelivr.net/npm/img-comparison-slider@8/dist/index.js"></script>
 </body>
