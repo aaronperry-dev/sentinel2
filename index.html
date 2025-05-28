@@ -1,52 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Image Comparison Slider</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twentytwenty/1.0.0/twentytwenty.min.css">
-  <style>
-    body {
-      font-family: sans-serif;
-      background: #f0f0f0;
-      padding: 30px;
-    }
-
-    .comparison-container {
-      max-width: 1000px;
-      margin: auto;
-    }
-
-    .twentytwenty-container {
-      box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-      border-radius: 8px;
-      overflow: hidden;
-    }
-
-    h1 {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentinel-2 Image Comparison</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/img-comparison-slider@8/dist/styles.css">
+    <style>
+        /* Optional: Add some basic styling for your page */
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+            text-align: center;
+        }
+        img-comparison-slider {
+            max-width: 800px; /* Limit the max width of the slider */
+            margin: 20px auto; /* Center the slider */
+            height: auto; /* Maintain aspect ratio */
+        }
+    </style>
 </head>
 <body>
-  <h1>Land Cover Classification vs Satellite View</h1>
-  <div class="comparison-container">
-    <div class="twentytwenty-container">
-      <img src="./images/S2TrueColor.PNG" alt="True Color">
-      <img src="./images/S2LandCoverClass.PNG" alt="Land Cover Classification">
-    </div>
-  </div>
+    <h1>Sentinel-2 Before & After</h1>
 
-  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.event.move/2.0.0/jquery.event.move.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/twentytwenty/1.0.0/jquery.twentytwenty.min.js"></script>
-  <script>
-    $(function(){
-      $(".twentytwenty-container").twentytwenty({
-        default_offset_pct: 0.5,
-        orientation: 'horizontal'
-      });
-    });
-  </script>
+    <img-comparison-slider>
+        <img slot="first" src="images/S2TrueColor.PNG" alt="Before image">
+        <img slot="second" src="images/S2LandCoverClass.PNG" alt="After image">
+    </img-comparison-slider>
+
+    <p>This is a comparison of Sentinel-2 imagery.</p>
+
+    <script defer src="https://cdn.jsdelivr.net/npm/img-comparison-slider@8/dist/index.js"></script>
 </body>
 </html>
