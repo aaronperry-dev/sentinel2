@@ -58,18 +58,25 @@
         /* Styles for the comparison slider itself */
         img-comparison-slider {
             max-width: 900px;
-            margin: 30px auto 0; /* Adjusted margin-bottom to 0 for credit alignment */
+            margin: 30px auto 0;
             height: auto;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
             border-radius: 8px;
-            overflow: hidden; /* Important for border-radius to apply correctly */
+            overflow: hidden;
+            /* New: Customize slider handle and overlay colors */
+            --divider-width: 3px;
+            --handle-size: 40px; /* Make handle larger */
+            --divider-color: rgba(255, 255, 255, 0.7); /* White divider */
+            --handle-bg: rgba(255, 255, 255, 0.9); /* White handle */
+            --handle-icon-color: #333; /* Darker icons for contrast */
+            --handle-shadow: 0 2px 4px rgba(0,0,0,0.2); /* Subtle shadow on handle */
         }
 
         /* Responsive adjustments for smaller screens */
         @media (max-width: 768px) {
             img-comparison-slider {
                 max-width: 100%;
-                margin: 20px 10px 0; /* Adjusted margin-bottom to 0 for credit alignment */
+                margin: 20px 10px 0;
             }
             p, ul {
                 margin-left: 10px;
@@ -84,103 +91,94 @@
             height: auto;
         }
 
-        /* --- CSS for Overlay Text --- */
+        /* --- CSS for Overlay Text (adapted for slider-lite style) --- */
         /* These styles are applied to the <div> that wraps the image and text */
         img-comparison-slider [slot="first"] > div,
         img-comparison-slider [slot="second"] > div {
-            position: relative; /* Essential for absolute positioning of child text */
-            width: 100%; /* Ensure the wrapper fills the slot */
-            height: 100%; /* Ensure the wrapper fills the slot */
-            display: flex; /* Use flexbox to correctly position children */
-            align-items: flex-end; /* Align content to the bottom */
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center; /* Center horizontally */
+            align-items: flex-start; /* Align text to the top */
         }
-
-        /* For the second slot, align content to the right */
-        img-comparison-slider [slot="second"] > div {
-            justify-content: flex-end; /* Align image and text to the right for the second slot */
-        }
-
 
         .image-overlay-text {
             position: absolute;
-            bottom: 10px;
+            top: 10px; /* Position text at the top */
             color: white;
-            background-color: rgba(0, 0, 0, 0.5);
-            padding: 5px 10px;
+            background-color: rgba(0, 0, 0, 0.6); /* Slightly darker, more opaque background */
+            padding: 8px 15px; /* Larger padding for more prominent text */
             border-radius: 5px;
-            font-size: 0.9em;
+            font-size: 1.1em; /* Larger font size */
+            font-weight: bold; /* Make text bold */
             z-index: 10;
-            pointer-events: none;
+            pointer-events: none; /* Ensure it doesn't interfere with slider interaction */
             white-space: nowrap;
-            transform: translateX(0%);
-            left: 10px;
+            /* text-shadow: 1px 1px 2px rgba(0,0,0,0.5); /* Optional: add text shadow for readability */
         }
-
-        img-comparison-slider [slot="second"] .image-overlay-text {
-            left: auto;
-            right: 10px;
-        }
-
 
         /* --- CSS for Credit Text --- */
         .image-credit {
             max-width: 900px; /* Match slider width */
-            margin: 5px auto 15px; /* Reduced margin-bottom */
-            font-size: 0.85em; /* Smaller font */
-            color: #666; /* Gray text */
-            text-align: right; /* Align to the right */
-            padding: 0 10px; /* Small horizontal padding */
+            margin: 5px auto 15px;
+            font-size: 0.85em;
+            color: #666;
+            text-align: right;
+            padding: 0 10px;
         }
 
         @media (max-width: 768px) {
             .image-credit {
-                margin: 5px 10px 15px; /* Adjust margin for smaller screens */
-                text-align: center; /* Center on smaller screens if preferred */
+                margin: 5px 10px 15px;
+                text-align: center;
             }
         }
 
-        /* --- NEW CSS for Legend --- */
+        /* --- CSS for Legend --- */
         .legend-container {
             max-width: 900px;
-            margin: 10px auto 30px; /* Reduced top margin, increased bottom margin to separate from next section */
+            margin: 10px auto 30px;
             text-align: left;
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 5px;
             background-color: #fff;
-            display: grid; /* Use CSS Grid for a multi-column layout */
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* 2 columns for wider screens, adapts to 1 */
-            gap: 5px 15px; /* Reduced vertical gap, increased horizontal gap */
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 5px 15px;
         }
 
         .legend-container h3 {
-            grid-column: 1 / -1; /* Make the heading span all columns */
+            grid-column: 1 / -1;
             margin-top: 0;
             color: #0056b3;
-            font-size: 1.1em; /* Smaller font for heading */
-            margin-bottom: 10px; /* Reduced margin */
-            text-align: center; /* Center the legend title */
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            text-align: center;
         }
 
         .legend-item {
             display: flex;
             align-items: center;
-            margin-bottom: 0px; /* Remove bottom margin for compactness */
+            margin-bottom: 0px;
         }
 
         .legend-color-box {
-            width: 16px; /* Smaller box */
-            height: 16px; /* Smaller box */
-            border: 1px solid #ccc; /* Subtle border for clarity */
-            margin-right: 8px; /* Reduced margin */
+            width: 16px;
+            height: 16px;
+            border: 1px solid #ccc;
+            margin-right: 8px;
             flex-shrink: 0;
         }
 
         .legend-item span {
-            font-size: 0.85em; /* Smaller font for text */
+            font-size: 0.85em;
             color: #555;
-            line-height: 1.2; /* Adjust line height for compactness */
+            line-height: 1.2;
         }
+
+        /* Removed: #classification-info and #hiddenCanvas styles */
     </style>
 </head>
 <body>
@@ -190,7 +188,7 @@
         Explore the difference between a true-color Sentinel-2 satellite image and its corresponding land cover classification. Drag the slider bar to reveal more of either the original satellite view or the classified land cover map.
     </p>
 
-    <img-comparison-slider>
+    <img-comparison-slider id="comparisonSlider">
         <div slot="first">
             <img src="images/S2TrueColor.PNG" alt="Sentinel-2 True Color Image" />
             <span class="image-overlay-text">True Color</span>
@@ -203,7 +201,7 @@
     </img-comparison-slider>
 
     <div class="image-credit">
-        Credit: Aaron Perry, derived from Sentinel-2 data.
+        Credit: Aaron Perry, derived from Sentinel-2 L2A data.
     </div>
 
     <div class="legend-container">
@@ -279,5 +277,10 @@
     </p>
 
     <script defer src="https://cdn.jsdelivr.net/npm/img-comparison-slider@8/dist/index.js"></script>
+
+    <script>
+        // All previous JavaScript for the hover classification has been removed.
+        // The img-comparison-slider library handles the core comparison logic.
+    </script>
 </body>
 </html>
