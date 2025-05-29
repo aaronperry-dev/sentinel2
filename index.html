@@ -292,40 +292,66 @@
             const trueColorLabel = document.getElementById('trueColorLabel');
             const landCoverLabel = document.getElementById('landCoverLabel');
 
-            if (comparisonSlider && trueColorLabel && landCoverLabel) {
-                // Auto-move slider based on mouse position
-                comparisonSlider.addEventListener('mousemove', (e) => {
-                    const rect = comparisonSlider.getBoundingClientRect();
-                    const mouseX = e.clientX - rect.left; // X position relative to the slider
-                    let percentage = (mouseX / rect.width) * 100; // Convert to percentage
+            let animationFrameId = null; // To store the requestAnimationFrame ID
+            let targetPercentage = 50; // The target value the slider should move to
 
-                    // Clamp the value between 0 and 100
-                    percentage = Math.max(0, Math.min(100, percentage));
+            // Function to update the slider's position and label visibility
+            function updateSliderAndLabels() {
+                if (comparisonSlider) {
+                    // Smoothly animate the slider value towards the targetPercentage
+                    // You can adjust the "0.2" (or "smoothingFactor") for more or less smoothing
+                    comparisonSlider.value += (targetPercentage - comparisonSlider.value) * 0.2;
 
-                    // Update the slider's value directly
-                    comparisonSlider.value = percentage;
+                    // Dynamically hide/show labels based on the *current* slider value
+                    const currentValue = comparisonSlider.value;
 
-                    // Dynamically hide/show labels
                     // If slider is almost entirely to the right (True Color hidden), hide Land Cover label
-                    if (percentage > 98) { // 98% to 100%
+                    if (currentValue > 98) { // 98% to 100%
                         landCoverLabel.style.opacity = '0';
                     } else {
                         landCoverLabel.style.opacity = '1';
                     }
 
                     // If slider is almost entirely to the left (Land Cover hidden), hide True Color label
-                    if (percentage < 2) { // 0% to 2%
+                    if (currentValue < 2) { // 0% to 2%
                         trueColorLabel.style.opacity = '0';
                     } else {
                         trueColorLabel.style.opacity = '1';
                     }
+                }
+                animationFrameId = requestAnimationFrame(updateSliderAndLabels);
+            }
+
+            if (comparisonSlider && trueColorLabel && landCoverLabel) {
+                // Event listener to capture the mouse position
+                comparisonSlider.addEventListener('mousemove', (e) => {
+                    const rect = comparisonSlider.getBoundingClientRect();
+                    const mouseX = e.clientX - rect.left; // X position relative to the slider
+                    let newPercentage = (mouseX / rect.width) * 100; // Convert to percentage
+
+                    // Clamp the value between 0 and 100
+                    targetPercentage = Math.max(0, Math.min(100, newPercentage));
+
+                    // If animation loop is not running, start it
+                    if (!animationFrameId) {
+                        animationFrameId = requestAnimationFrame(updateSliderAndLabels);
+                    }
                 });
 
-                // NO mouseleave event to prevent "bouncing back to center"
-                // The slider will stay at the last position it was moved to by the cursor.
+                // When mouse leaves, stop the animation loop
+                comparisonSlider.addEventListener('mouseleave', () => {
+                    if (animationFrameId) {
+                        cancelAnimationFrame(animationFrameId);
+                        animationFrameId = null;
+                    }
+                    // Optionally, reset slider to center after mouse leaves and animation stops
+                    // comparisonSlider.value = 50; // Removed this to keep it at last position
+                });
 
-                // Optional: Ensure labels are visible if user uses touch/drag initially or on page load
-                // You might want to set initial opacity to 1 in CSS for this.
+                // Start the animation loop initially (e.g., if slider starts at 50)
+                // This ensures labels are correctly shown/hidden on load too
+                animationFrameId = requestAnimationFrame(updateSliderAndLabels);
+
             } else {
                 console.error("One or more required elements (slider or labels) not found!");
             }
