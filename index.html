@@ -139,69 +139,47 @@
             }
         }
 
-        /* --- CSS for Legend --- */
+        /* --- NEW CSS for Legend --- */
         .legend-container {
             max-width: 900px;
-            margin: 10px auto 30px;
+            margin: 10px auto 30px; /* Reduced top margin, increased bottom margin to separate from next section */
             text-align: left;
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 5px;
             background-color: #fff;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 5px 15px;
+            display: grid; /* Use CSS Grid for a multi-column layout */
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* 2 columns for wider screens, adapts to 1 */
+            gap: 5px 15px; /* Reduced vertical gap, increased horizontal gap */
         }
 
         .legend-container h3 {
-            grid-column: 1 / -1;
+            grid-column: 1 / -1; /* Make the heading span all columns */
             margin-top: 0;
             color: #0056b3;
-            font-size: 1.1em;
-            margin-bottom: 10px;
-            text-align: center;
+            font-size: 1.1em; /* Smaller font for heading */
+            margin-bottom: 10px; /* Reduced margin */
+            text-align: center; /* Center the legend title */
         }
 
         .legend-item {
             display: flex;
             align-items: center;
-            margin-bottom: 0px;
+            margin-bottom: 0px; /* Remove bottom margin for compactness */
         }
 
         .legend-color-box {
-            width: 16px;
-            height: 16px;
-            border: 1px solid #ccc;
-            margin-right: 8px;
+            width: 16px; /* Smaller box */
+            height: 16px; /* Smaller box */
+            border: 1px solid #ccc; /* Subtle border for clarity */
+            margin-right: 8px; /* Reduced margin */
             flex-shrink: 0;
         }
 
         .legend-item span {
-            font-size: 0.85em;
+            font-size: 0.85em; /* Smaller font for text */
             color: #555;
-            line-height: 1.2;
-        }
-
-        /* --- NEW CSS for Classification Display --- */
-        #classification-info {
-            max-width: 900px;
-            margin: 15px auto;
-            padding: 10px 20px;
-            background-color: #e6f7ff; /* Light blue background */
-            border: 1px solid #91d5ff;
-            border-radius: 5px;
-            font-size: 1.1em;
-            color: #0056b3;
-            min-height: 30px; /* Ensure it doesn't collapse */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-        }
-
-        /* Hide the canvas from view */
-        #hiddenCanvas {
-            display: none;
+            line-height: 1.2; /* Adjust line height for compactness */
         }
     </style>
 </head>
@@ -212,24 +190,20 @@
         Explore the difference between a true-color Sentinel-2 satellite image and its corresponding land cover classification. Drag the slider bar to reveal more of either the original satellite view or the classified land cover map.
     </p>
 
-    <img-comparison-slider id="comparisonSlider">
+    <img-comparison-slider>
         <div slot="first">
             <img src="images/S2TrueColor.PNG" alt="Sentinel-2 True Color Image" />
             <span class="image-overlay-text">True Color</span>
         </div>
 
         <div slot="second">
-            <img id="landCoverImage" src="images/S2LandCoverClass.PNG" alt="Sentinel-2 Land Cover Classification" />
+            <img src="images/S2LandCoverClass.PNG" alt="Sentinel-2 Land Cover Classification" />
             <span class="image-overlay-text">Land Cover Classification</span>
         </div>
     </img-comparison-slider>
 
-    <div id="classification-info">
-        Hover over the Land Cover Classification image to see the class.
-    </div>
-
     <div class="image-credit">
-        Credit: Aaron Perry, derived from Sentinel-2 L2A data.
+        Credit: Aaron Perry, derived from Sentinel-2 data.
     </div>
 
     <div class="legend-container">
@@ -305,139 +279,5 @@
     </p>
 
     <script defer src="https://cdn.jsdelivr.net/npm/img-comparison-slider@8/dist/index.js"></script>
-
-    <script>
-        // --- Setup for Classification Lookup ---
-        const landCoverImageSrc = 'images/S2LandCoverClass.PNG';
-        const hiddenCanvas = document.createElement('canvas'); // Create a hidden canvas
-        const ctx = hiddenCanvas.getContext('2d');
-        const img = new Image();
-        img.src = landCoverImageSrc;
-        img.crossOrigin = "Anonymous"; // Essential for local file access to prevent CORS issues if hosted differently
-
-        const classificationInfoDiv = document.getElementById('classification-info');
-        // Get a direct reference to the image element inside the slider's second slot
-        const landCoverDisplayImage = document.getElementById('landCoverImage');
-
-        // Define the color mapping for your legend
-        const classColors = [
-            { r: 224, g: 224, b: 224, name: '0: Unclassified' },      // Light Gray
-            { r: 211, g: 211, b: 211, name: '1: Clouds / Haze' },     // Lighter Gray
-            { r: 135, g: 206, b: 235, name: '2: Water' },             // Sky Blue
-            { r: 105, g: 105, b: 105, name: '4: Cloud Shadows' },     // Dim Gray
-            { r: 0, g: 100, b: 0, name: '5: Dense Conifer Forest' }, // Dark Green
-            { r: 128, g: 128, b: 128, name: '6: Roadways' },          // Gray
-            { r: 0, g: 128, b: 0, name: '8: Dense Forest' },         // Green
-            { r: 152, g: 251, b: 152, name: '9: Low Vegetation' },    // Pale Green
-            { r: 210, g: 180, b: 140, name: '10: Bare Rock' },        // Tan
-            { r: 255, g: 194, b: 127, name: '11: Bare Soil' }         // Peach/Orange
-            // For white snow/ice (3), often it's pure white, but if there's a slight off-white, consider that.
-            // For now, handling it as a special case or ensuring its RGB is truly 255,255,255.
-            // Added 3: Snow / Ice, assuming pure white from legend.
-            ,{ r: 255, g: 255, b: 255, name: '3: Snow / Ice' } // Pure White for Snow/Ice
-        ];
-
-        // Function to calculate color distance (Euclidean distance in RGB space)
-        function getColorDistance(rgb1, rgb2) {
-            return Math.sqrt(
-                Math.pow(rgb1.r - rgb2.r, 2) +
-                Math.pow(rgb1.g - rgb2.g, 2) +
-                Math.pow(rgb1.b - rgb2.b, 2)
-            );
-        }
-
-        // Function to find the closest class name for an RGB value
-        function getClassNameForRGB(r, g, b) {
-            const pixelColor = { r, g, b };
-            let closestClass = 'Unknown Classification';
-            let minDistance = Infinity;
-            // A higher tolerance makes it more forgiving, a lower tolerance makes it stricter.
-            // Adjust this based on how precisely the colors in your image match the legend.
-            const tolerance = 30; // Increased tolerance slightly
-
-            for (const classColor of classColors) {
-                const distance = getColorDistance(pixelColor, classColor);
-                if (distance < minDistance) {
-                    minDistance = distance;
-                    closestClass = classColor.name;
-                }
-            }
-
-            // If the closest match is still too far, it's considered an "unknown" color
-            // This helps with areas where the classification output colors might be slightly off.
-            if (minDistance > tolerance) {
-                return `Unknown Classification (RGB: ${r}, ${g}, ${b})`;
-            }
-            return closestClass;
-        }
-
-        // When the hidden image loads, draw it onto the canvas
-        img.onload = function() {
-            hiddenCanvas.width = img.naturalWidth; // Use naturalWidth/Height for original resolution
-            hiddenCanvas.height = img.naturalHeight;
-            ctx.drawImage(img, 0, 0);
-            console.log('Land Cover Classification image loaded onto hidden canvas. Dimensions:', hiddenCanvas.width, 'x', hiddenCanvas.height);
-        };
-
-        // Add event listener only after the DOM is fully loaded and the image is available
-        document.addEventListener('DOMContentLoaded', () => {
-            // Ensure the image element is correctly retrieved
-            if (landCoverDisplayImage) {
-                landCoverDisplayImage.addEventListener('mousemove', function(e) {
-                    // Check if the hidden canvas image is ready
-                    if (img.complete && ctx) {
-                        // Get the bounding rectangle of the *visible* image
-                        const rect = landCoverDisplayImage.getBoundingClientRect();
-                        
-                        // Calculate mouse position relative to the visible image
-                        const x = e.clientX - rect.left;
-                        const y = e.clientY - rect.top;
-
-                        // Scale the coordinates to the original image dimensions on the hidden canvas
-                        // This handles cases where the displayed image is resized by CSS
-                        const imgNaturalWidth = img.naturalWidth;
-                        const imgNaturalHeight = img.naturalHeight;
-                        const displayedWidth = rect.width;
-                        const displayedHeight = rect.height;
-
-                        const scaledX = Math.floor((x / displayedWidth) * imgNaturalWidth);
-                        const scaledY = Math.floor((y / displayedHeight) * imgNaturalHeight);
-
-                        console.log(`Mouse: (${e.clientX}, ${e.clientY}), Rect: (${rect.left}, ${rect.top}), Scaled: (${scaledX}, ${scaledY})`);
-
-                        // Ensure scaled coordinates are within canvas bounds
-                        if (scaledX >= 0 && scaledX < hiddenCanvas.width && scaledY >= 0 && scaledY < hiddenCanvas.height) {
-                            try {
-                                const pixel = ctx.getImageData(scaledX, scaledY, 1, 1).data;
-                                const r = pixel[0];
-                                const g = pixel[1];
-                                const b = pixel[2];
-                                // pixel[3] is alpha, not typically used for classification lookup
-
-                                const className = getClassNameForRGB(r, g, b);
-                                classificationInfoDiv.textContent = `(${scaledX}, ${scaledY}) - Class: ${className}`;
-                                // Optional: You can also show the exact RGB for debugging
-                                // classificationInfoDiv.textContent = `(${scaledX}, ${scaledY}) - Class: ${className} (RGB: ${r}, ${g}, ${b})`;
-                            } catch (error) {
-                                console.error("Error getting pixel data:", error);
-                                classificationInfoDiv.textContent = 'Error reading pixel data.';
-                            }
-                        } else {
-                            classificationInfoDiv.textContent = 'Hover over the Land Cover Classification image to see the class.';
-                        }
-                    } else {
-                        classificationInfoDiv.textContent = 'Image loading...';
-                    }
-                });
-
-                // Clear the info when mouse leaves the image
-                landCoverDisplayImage.addEventListener('mouseleave', function() {
-                    classificationInfoDiv.textContent = 'Hover over the Land Cover Classification image to see the class.';
-                });
-            } else {
-                console.error("Land Cover Display Image element not found!");
-            }
-        });
-    </script>
 </body>
 </html>
