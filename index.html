@@ -98,7 +98,6 @@
             position: relative;
             width: 100%;
             height: 100%;
-            /* Removed flexbox centering for labels to allow absolute positioning */
         }
 
         .image-overlay-text {
@@ -112,6 +111,9 @@
             z-index: 10;
             pointer-events: none; /* Ensure it doesn't interfere with slider interaction */
             white-space: nowrap;
+            /* Add transition for smooth hiding/showing */
+            transition: opacity 0.3s ease-in-out;
+            opacity: 1; /* Default to visible */
         }
 
         /* Position "True Color" label in top-left */
@@ -125,7 +127,6 @@
             top: 10px;
             right: 10px;
         }
-
 
         /* --- CSS for Credit Text --- */
         .image-credit {
@@ -198,12 +199,12 @@
     <img-comparison-slider id="comparisonSlider">
         <div slot="first">
             <img src="images/S2TrueColor.PNG" alt="Sentinel-2 True Color Image" />
-            <span class="image-overlay-text">True Color</span>
+            <span class="image-overlay-text" id="trueColorLabel">True Color</span>
         </div>
 
         <div slot="second">
             <img src="images/S2LandCoverClass.PNG" alt="Sentinel-2 Land Cover Classification" />
-            <span class="image-overlay-text">Land Cover Classification</span>
+            <span class="image-overlay-text" id="landCoverLabel">Land Cover Classification</span>
         </div>
     </img-comparison-slider>
 
@@ -288,25 +289,45 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const comparisonSlider = document.getElementById('comparisonSlider');
+            const trueColorLabel = document.getElementById('trueColorLabel');
+            const landCoverLabel = document.getElementById('landCoverLabel');
 
-            if (comparisonSlider) {
+            if (comparisonSlider && trueColorLabel && landCoverLabel) {
                 // Auto-move slider based on mouse position
                 comparisonSlider.addEventListener('mousemove', (e) => {
                     const rect = comparisonSlider.getBoundingClientRect();
                     const mouseX = e.clientX - rect.left; // X position relative to the slider
-                    const percentage = (mouseX / rect.width) * 100; // Convert to percentage
+                    let percentage = (mouseX / rect.width) * 100; // Convert to percentage
+
+                    // Clamp the value between 0 and 100
+                    percentage = Math.max(0, Math.min(100, percentage));
 
                     // Update the slider's value directly
-                    // Clamp the value between 0 and 100 to prevent issues if mouse goes slightly out of bounds
-                    comparisonSlider.value = Math.max(0, Math.min(100, percentage));
+                    comparisonSlider.value = percentage;
+
+                    // Dynamically hide/show labels
+                    // If slider is almost entirely to the right (True Color hidden), hide Land Cover label
+                    if (percentage > 98) { // 98% to 100%
+                        landCoverLabel.style.opacity = '0';
+                    } else {
+                        landCoverLabel.style.opacity = '1';
+                    }
+
+                    // If slider is almost entirely to the left (Land Cover hidden), hide True Color label
+                    if (percentage < 2) { // 0% to 2%
+                        trueColorLabel.style.opacity = '0';
+                    } else {
+                        trueColorLabel.style.opacity = '1';
+                    }
                 });
 
-                // Optional: Reset slider to default when mouse leaves
-                comparisonSlider.addEventListener('mouseleave', () => {
-                    comparisonSlider.value = 50; // Reset to center
-                });
+                // NO mouseleave event to prevent "bouncing back to center"
+                // The slider will stay at the last position it was moved to by the cursor.
+
+                // Optional: Ensure labels are visible if user uses touch/drag initially or on page load
+                // You might want to set initial opacity to 1 in CSS for this.
             } else {
-                console.error("Comparison slider element not found!");
+                console.error("One or more required elements (slider or labels) not found!");
             }
         });
     </script>
