@@ -218,8 +218,8 @@
             <span class="image-overlay-text">True Color</span>
         </div>
 
-        <div slot="second" id="landCoverSlot">
-            <img src="images/S2LandCoverClass.PNG" alt="Sentinel-2 Land Cover Classification" />
+        <div slot="second">
+            <img id="landCoverImage" src="images/S2LandCoverClass.PNG" alt="Sentinel-2 Land Cover Classification" />
             <span class="image-overlay-text">Land Cover Classification</span>
         </div>
     </img-comparison-slider>
@@ -229,7 +229,7 @@
     </div>
 
     <div class="image-credit">
-        Credit: Aaron Perry, derived from Sentinel-2 data.
+        Credit: Aaron Perry, derived from Sentinel-2 L2A data.
     </div>
 
     <div class="legend-container">
@@ -313,17 +313,17 @@
         const ctx = hiddenCanvas.getContext('2d');
         const img = new Image();
         img.src = landCoverImageSrc;
-        img.crossOrigin = "Anonymous"; // Essential for local file access if hosted differently, but generally good practice
+        img.crossOrigin = "Anonymous"; // Essential for local file access to prevent CORS issues if hosted differently
 
         const classificationInfoDiv = document.getElementById('classification-info');
-        const landCoverSlot = document.getElementById('landCoverSlot'); // The <div> element that holds the Land Cover image in the slider
+        // Get a direct reference to the image element inside the slider's second slot
+        const landCoverDisplayImage = document.getElementById('landCoverImage');
 
         // Define the color mapping for your legend
         const classColors = [
             { r: 224, g: 224, b: 224, name: '0: Unclassified' },      // Light Gray
             { r: 211, g: 211, b: 211, name: '1: Clouds / Haze' },     // Lighter Gray
             { r: 135, g: 206, b: 235, name: '2: Water' },             // Sky Blue
-            { r: 255, g: 255, b: 255, name: '3: Snow / Ice' },        // White
             { r: 105, g: 105, b: 105, name: '4: Cloud Shadows' },     // Dim Gray
             { r: 0, g: 100, b: 0, name: '5: Dense Conifer Forest' }, // Dark Green
             { r: 128, g: 128, b: 128, name: '6: Roadways' },          // Gray
@@ -331,8 +331,10 @@
             { r: 152, g: 251, b: 152, name: '9: Low Vegetation' },    // Pale Green
             { r: 210, g: 180, b: 140, name: '10: Bare Rock' },        // Tan
             { r: 255, g: 194, b: 127, name: '11: Bare Soil' }         // Peach/Orange
-            // Note: These RGB values are approximations based on common color names.
-            // For precise matching, you'd need the exact RGB values used to generate the image.
+            // For white snow/ice (3), often it's pure white, but if there's a slight off-white, consider that.
+            // For now, handling it as a special case or ensuring its RGB is truly 255,255,255.
+            // Added 3: Snow / Ice, assuming pure white from legend.
+            ,{ r: 255, g: 255, b: 255, name: '3: Snow / Ice' } // Pure White for Snow/Ice
         ];
 
         // Function to calculate color distance (Euclidean distance in RGB space)
@@ -349,7 +351,9 @@
             const pixelColor = { r, g, b };
             let closestClass = 'Unknown Classification';
             let minDistance = Infinity;
-            const tolerance = 50; // You can adjust this tolerance for fuzzy matching
+            // A higher tolerance makes it more forgiving, a lower tolerance makes it stricter.
+            // Adjust this based on how precisely the colors in your image match the legend.
+            const tolerance = 30; // Increased tolerance slightly
 
             for (const classColor of classColors) {
                 const distance = getColorDistance(pixelColor, classColor);
@@ -359,63 +363,80 @@
                 }
             }
 
-            // If the closest match is still too far, it might be genuinely unclassified or an outlier
+            // If the closest match is still too far, it's considered an "unknown" color
+            // This helps with areas where the classification output colors might be slightly off.
             if (minDistance > tolerance) {
-                // If there's an 'Unclassified' class in your legend, you can return that
-                // Otherwise, 'Unknown Classification' is a good fallback.
-                return 'Unknown Classification (or a variant not in legend)';
+                return `Unknown Classification (RGB: ${r}, ${g}, ${b})`;
             }
             return closestClass;
         }
 
         // When the hidden image loads, draw it onto the canvas
         img.onload = function() {
-            hiddenCanvas.width = img.width;
-            hiddenCanvas.height = img.height;
+            hiddenCanvas.width = img.naturalWidth; // Use naturalWidth/Height for original resolution
+            hiddenCanvas.height = img.naturalHeight;
             ctx.drawImage(img, 0, 0);
-            console.log('Land Cover Classification image loaded onto hidden canvas.');
+            console.log('Land Cover Classification image loaded onto hidden canvas. Dimensions:', hiddenCanvas.width, 'x', hiddenCanvas.height);
         };
 
-        // Event listener for mouse movement on the visible Land Cover image slot
-        landCoverSlot.addEventListener('mousemove', function(e) {
-            if (img.complete) { // Ensure image is loaded before trying to read pixels
-                // Get the bounding rectangle of the visible image slot
-                const rect = landCoverSlot.querySelector('img').getBoundingClientRect();
-                
-                // Calculate mouse position relative to the visible image
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
+        // Add event listener only after the DOM is fully loaded and the image is available
+        document.addEventListener('DOMContentLoaded', () => {
+            // Ensure the image element is correctly retrieved
+            if (landCoverDisplayImage) {
+                landCoverDisplayImage.addEventListener('mousemove', function(e) {
+                    // Check if the hidden canvas image is ready
+                    if (img.complete && ctx) {
+                        // Get the bounding rectangle of the *visible* image
+                        const rect = landCoverDisplayImage.getBoundingClientRect();
+                        
+                        // Calculate mouse position relative to the visible image
+                        const x = e.clientX - rect.left;
+                        const y = e.clientY - rect.top;
 
-                // Scale the coordinates to the original image dimensions
-                // The visible image might be scaled by CSS, so we need to map mouse coords
-                // from the *displayed size* to the *original pixel size* of the image
-                const imgNaturalWidth = img.naturalWidth;
-                const imgNaturalHeight = img.naturalHeight;
-                const displayedWidth = rect.width;
-                const displayedHeight = rect.height;
+                        // Scale the coordinates to the original image dimensions on the hidden canvas
+                        // This handles cases where the displayed image is resized by CSS
+                        const imgNaturalWidth = img.naturalWidth;
+                        const imgNaturalHeight = img.naturalHeight;
+                        const displayedWidth = rect.width;
+                        const displayedHeight = rect.height;
 
-                const scaledX = Math.floor((x / displayedWidth) * imgNaturalWidth);
-                const scaledY = Math.floor((y / displayedHeight) * imgNaturalHeight);
+                        const scaledX = Math.floor((x / displayedWidth) * imgNaturalWidth);
+                        const scaledY = Math.floor((y / displayedHeight) * imgNaturalHeight);
 
-                // Ensure coordinates are within canvas bounds
-                if (scaledX >= 0 && scaledX < hiddenCanvas.width && scaledY >= 0 && scaledY < hiddenCanvas.height) {
-                    const pixel = ctx.getImageData(scaledX, scaledY, 1, 1).data;
-                    const r = pixel[0];
-                    const g = pixel[1];
-                    const b = pixel[2];
-                    // pixel[3] is alpha, not typically used for classification lookup
+                        console.log(`Mouse: (${e.clientX}, ${e.clientY}), Rect: (${rect.left}, ${rect.top}), Scaled: (${scaledX}, ${scaledY})`);
 
-                    const className = getClassNameForRGB(r, g, b);
-                    classificationInfoDiv.textContent = `(${scaledX}, ${scaledY}) - Class: ${className} (RGB: ${r}, ${g}, ${b})`;
-                } else {
+                        // Ensure scaled coordinates are within canvas bounds
+                        if (scaledX >= 0 && scaledX < hiddenCanvas.width && scaledY >= 0 && scaledY < hiddenCanvas.height) {
+                            try {
+                                const pixel = ctx.getImageData(scaledX, scaledY, 1, 1).data;
+                                const r = pixel[0];
+                                const g = pixel[1];
+                                const b = pixel[2];
+                                // pixel[3] is alpha, not typically used for classification lookup
+
+                                const className = getClassNameForRGB(r, g, b);
+                                classificationInfoDiv.textContent = `(${scaledX}, ${scaledY}) - Class: ${className}`;
+                                // Optional: You can also show the exact RGB for debugging
+                                // classificationInfoDiv.textContent = `(${scaledX}, ${scaledY}) - Class: ${className} (RGB: ${r}, ${g}, ${b})`;
+                            } catch (error) {
+                                console.error("Error getting pixel data:", error);
+                                classificationInfoDiv.textContent = 'Error reading pixel data.';
+                            }
+                        } else {
+                            classificationInfoDiv.textContent = 'Hover over the Land Cover Classification image to see the class.';
+                        }
+                    } else {
+                        classificationInfoDiv.textContent = 'Image loading...';
+                    }
+                });
+
+                // Clear the info when mouse leaves the image
+                landCoverDisplayImage.addEventListener('mouseleave', function() {
                     classificationInfoDiv.textContent = 'Hover over the Land Cover Classification image to see the class.';
-                }
+                });
+            } else {
+                console.error("Land Cover Display Image element not found!");
             }
-        });
-
-        // Clear the info when mouse leaves the image slot
-        landCoverSlot.addEventListener('mouseleave', function() {
-            classificationInfoDiv.textContent = 'Hover over the Land Cover Classification image to see the class.';
         });
     </script>
 </body>
